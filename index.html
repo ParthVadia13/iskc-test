@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISKC Black Belt Test</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212; /* Dark background */
+      color: #e0e0e0; /* Light text color */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    
+    #app {
+      background-color: #1f1f1f; /* Dark container background */
+      border-radius: 10px;
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    }
+  
+    h1, h2 {
+      font-size: 24px;
+      color: #f0f0f0;
+    }
+  
+    .counter {
+      font-size: 14px;
+      color: #a0a0a0;
+      margin-bottom: 10px;
+    }
+  
+    button {
+      background-color: #6200ea; /* Purple background */
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin: 10px 0;
+    }
+  
+    button:hover {
+      background-color: #3700b3; /* Darker purple on hover */
+    }
+
+    .etcButton{
+        background-color:#e0e0e0;
+        color: #3700b3;
+    }
+
+    .etcButton:hover{
+        background-color:#a0a0a0;
+    }
+  
+    .note {
+      color: #a0a0a0;
+      font-size: 14px;
+    }
+  
+    input {
+      background-color: #333;
+      color: white;
+      padding: 8px 15px;
+      border: 1px solid #555;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 95%;
+      margin: 8px 0;
+    }
+  
+    input:focus {
+      outline: none;
+      border-color: #6200ea;
+    }
+  
+    label {
+      color: #f0f0f0;
+      display: block;
+      margin: 5px 0;
+    }
+  
+    .hidden {
+      display: none;
+    }
+  
+    /* Smooth scroll for the body */
+    html, body {
+      scroll-behavior: smooth;
+    }
+  </style>
+  
+</head>
+<body style="margin: 0; background-color: #111; color: white; display: flex; flex-direction: column; min-height: 100vh; font-family: sans-serif; text-align: center;">
+    <div id="app"></div>
+  
+    <footer style="position: fixed; bottom: 0; width: 100%; font-size: 12px; color: #888; text-align: center; padding: 20px; background-color: #111;">
+        <p>This is not an official ISKC app. This app is not affiliated with ISKC in any way and does not intend to harm their image. It is simply a tool to train based on patterns in their test making.</p>
+    </footer>
+  
+    <script>
+      const app = document.getElementById("app");
+      let currentSlideIndex = 0;
+      let slides = [];
+      let settings = { basics: 10, katas: 1, vocab: 5 };
+  
+      const predefinedCombinations = [
+        "Triple punch",
+        "Rising block / reverse punch (forward and backward)",
+        "Downward block / reverse punch (forward and backward)",
+        "Inward block / horse stance elbow strike / back fist (forward and backward)",
+        "Outward block / reverse punch (forward and backward)",
+        "Knife hand block / front leg kick / spear hand (forward and backward)",
+        "Mae-geri Ren-geri",
+        "Front-snap / side-thrust / back kick",
+        "Front-snap / side-thrust to the front"
+      ];
+  
+      const group1 = ["outward block", "inward block", "knife hand block", "downward block", "upward block", "front punch", "front kick", ""];
+      const group2 = ["front-snap kick", "side-thrust kick", "round-house kick", "front punch", "reverse punch", ""];
+      const group3 = ["front or reverse punch", "nukite", ""];
+  
+      const heianKatas = ["Heian Shodan", "Heian Nidan", "Heian Sandan", "Heian Yondan", "Heian Godan"];
+  
+      const vocabPairs = [
+        ["Horse stance", "Kiba dachi"], ["Front stance", "Zenkutsu dachi"], ["Back stance", "Kokutsu dachi"],
+        ["Cross-leg stance", "Kosa dachi"], ["Cat stance", "Neko ashi dachi"], ["Square stance", "Shiko dachi"],
+        ["Diagonal horse stance", "Sochin dachi"], ["Half moon stance", "Hangetsu dachi"], ["Hourglass stance", "Sanchin dachi"],
+        ["Fighting position", "Kamae"], ["Straight punch", "Choko zuki"], ["Lunge punch", "Oi zuki"],
+        ["Jab", "Kizami zuki"], ["Reverse punch", "Gyaku zuki"], ["Back fist", "Uraken uchi"],
+        ["Hook punch", "Kage zuki"], ["Rising punch", "Age zuki"], ["Wide U punch", "Yama zuki"],
+        ["Spearhand strike", "Nuki te"], ["Knife hand strike", "Shuto uchi"], ["Ridge hand strike", "Haito uchi"],
+        ["Elbow strike", "Empi uchi"], ["Palm strike", "Taisho uchi"], ["Hammer fist", "Ken tsui"],
+        ["Front kick", "Mae geri"], ["Roundhouse kick", "Mawashi geri"], ["Side thrust kick", "Yoko geri kekomi"],
+        ["Side snap kick", "Yoko geri keage"], ["Back kick", "Ushiro geri"], ["Crescent kick", "Mikazuki geri"],
+        ["Hook kick", "Ura mawashi geri"], ["Knee strike", "Hiza geri"], ["Stomping kick", "Fumikomi"],
+        ["Jump kick", "Tobi geri"], ["Rising block", "Age uke"], ["Inward block", "Soto uke"],
+        ["Outward block", "Uchi uke"], ["Knife hand block", "Shuto uke"], ["Downward block", "Gedan barai"],
+        ["X block", "Juji uke"], ["Assisted block", "Morote uke"], ["Pressing block", "Osai uke"],
+        ["Bow", "Rei"], ["Left", "Hidari"], ["Right", "Migi"], ["Turn", "Mawate"],
+        ["Lower level", "Gedan"], ["Middle level", "Chudan"], ["Upper level", "Jodan"],
+        ["Draw hand", "Hiki te"], ["Foot retraction", "Hiki ashi"]
+      ];
+  
+      function getRandomElements(arr, count) {
+        return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
+      }
+  
+      function generateRandomCombo() {
+        const part1 = group1[Math.floor(Math.random() * group1.length)];
+        const part2 = group2[Math.floor(Math.random() * group2.length)];
+        const part3 = group3[Math.floor(Math.random() * group3.length)];
+        const combo = [part1, part2, part3].filter(Boolean).join(" / ");
+        return Math.random() < 0.5 ? combo : combo + " (forward and backward)";
+      }
+  
+      function showSlide(index) {
+        app.innerHTML = "";
+        app.appendChild(slides[index]);
+      }
+  
+      function createSlide(content) {
+        const div = document.createElement("div");
+        div.innerHTML = content;
+        return div;
+      }
+  
+      function createSectionIntro(title) {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <h2>${title} Section</h2>
+          <button onclick="nextSlide()">Start Section</button>
+        `;
+        return div;
+      }
+  
+      function rerollCombo(index) {
+        const newCombo = generateRandomCombo();
+        document.getElementById(`randomCombo${index}`).innerText = newCombo;
+      }
+  
+      function revealTranslation(index, english) {
+        document.getElementById(`vocab${index}`).innerText = english;
+      }
+  
+      function generateTestSlides() {
+        slides.push(createSectionIntro("Basics"));
+  
+        const half = Math.floor(settings.basics / 2);
+        const predefined = getRandomElements(predefinedCombinations, half);
+        const randomCombos = Array.from({ length: half }, generateRandomCombo);
+  
+        let count = 1;
+        predefined.forEach(combo => {
+          slides.push(createSlide(`
+            <div class="counter">Basic ${count++} of ${settings.basics}</div>
+            <h2>${combo}</h2>
+            <button onclick="nextSlide()">Next</button>
+          `));
+        });
+  
+        randomCombos.forEach((combo, index) => {
+          const slide = document.createElement("div");
+          slide.innerHTML = `
+            <div class="counter">Basic ${count++} of ${settings.basics}</div>
+            <h2 id="randomCombo${index}">${combo}</h2>
+            <div class="note">This is a randomly generated combination</div>
+            <button onclick="nextSlide()">Next</button>
+            <button class="etcButton" onclick="rerollCombo(${index})">Reroll</button>
+          `;
+          slides.push(slide);
+        });
+  
+        slides.push(createSectionIntro("Kata"));
+  
+        slides.push(createSlide(`
+          <div class="counter">Kata 1 of ${settings.katas + 1}</div>
+          <h2>Bassai Dai</h2>
+          <button onclick="nextSlide()">Next</button>
+        `));
+  
+        const randomKatas = getRandomElements(heianKatas, settings.katas);
+        randomKatas.forEach((kata, i) => {
+          slides.push(createSlide(`
+            <div class="counter">Kata ${i + 2} of ${settings.katas + 1}</div>
+            <h2>${kata}</h2>
+            <div class="note">This is a randomly picked Heian kata</div>
+            <button onclick="nextSlide()">Next</button>
+          `));
+        });
+  
+        slides.push(createSectionIntro("Vocabulary"));
+  
+        const vocab = getRandomElements(vocabPairs, settings.vocab);
+        vocab.forEach(([eng, jp], i) => {
+          const div = document.createElement("div");
+          div.innerHTML = `
+            <div class="counter">Term ${i + 1} of ${settings.vocab}</div>
+            <h2 id="vocab${i}">${jp}</h2>
+            <button onclick="nextSlide()">Next</button>
+            <button class="etcButton" onclick="revealTranslation(${i}, '${eng}')">Reveal Translation</button>
+          `;
+          slides.push(div);
+        });
+  
+        slides.push(createSlide(`
+          <h2>Congratulations!</h2>
+          <p>You have completed the black belt test simulation.</p>
+          <button onclick="restartTest()">Start New Test</button>
+        `));
+      }
+  
+      function startTest() {
+        const basicCount = parseInt(document.getElementById("basicCount").value);
+        const kataCount = parseInt(document.getElementById("kataCount").value);
+        const vocabCount = parseInt(document.getElementById("vocabCount").value);
+        settings = { basics: basicCount, katas: kataCount, vocab: vocabCount };
+        slides = slides.slice(0, 1); // Keep only the start slide
+        generateTestSlides();
+        currentSlideIndex = 1;
+        showSlide(currentSlideIndex);
+      }
+  
+      function nextSlide() {
+        if (currentSlideIndex < slides.length - 1) {
+          currentSlideIndex++;
+          showSlide(currentSlideIndex);
+        }
+      }
+  
+      function restartTest() {
+        currentSlideIndex = 0;
+        slides = [];
+        setupSlides();
+        showSlide(0);
+      }
+  
+      function setupSlides() {
+        const startSlide = createSlide(`
+          <h1> ISKC Black Belt Test Simulator</h1>
+          <button id="startTestBtn">Start Test!</button>
+          <label for="basicCount">Number of Basics:</label>
+          <input id="basicCount" type="number" value="10" min="2" step="2">
+          <label for="kataCount">Number of Random Heian Katas:</label>
+          <input id="kataCount" type="number" value="1" min="0" max="5">
+          <label for="vocabCount">Number of Vocab Terms:</label>
+          <input id="vocabCount" type="number" value="5" min="1" max="${vocabPairs.length}">
+        `);
+        slides.push(startSlide);
+        startSlide.querySelector("#startTestBtn").addEventListener("click", startTest);
+      }
+  
+      setupSlides();
+      showSlide(0);
+    </script>
+    
+  </body>
+  
+</html>
